@@ -10,4 +10,4 @@
 * QR code 리더 커스텀뷰
 * Primary color 지정
 * logo 제작
-
+* 아키텍쳐 적용 (MVP, MVVVM)
