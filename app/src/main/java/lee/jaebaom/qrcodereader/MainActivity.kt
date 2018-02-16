@@ -2,30 +2,40 @@ package lee.jaebaom.qrcodereader
 
 import android.content.Intent
 import android.os.Bundle
-import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.google.zxing.integration.android.IntentIntegrator
 import com.google.zxing.integration.android.IntentResult
 import io.reactivex.Observable
-import io.reactivex.Scheduler
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 
+
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
+import lee.jaebaom.qrcodereader.util.SavaPreference
 import org.jsoup.Jsoup
 import java.util.*
+import kotlin.collections.ArrayList
 
 class MainActivity : AppCompatActivity() {
 
-    private val histories = ArrayList<History>()
-    private val adapter = MainRecyclerAdapter(histories)
+    private var histories = ArrayList<History>()
+    private lateinit var adapter : MainRecyclerAdapter
+    private val gson = Gson()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
+
+
+        SavaPreference.getStringPreference(this, "histories")
+
+        initHistories()
+        adapter = MainRecyclerAdapter(histories)
         recycler.adapter = adapter
 
         fab.setOnClickListener { view ->
@@ -54,17 +64,22 @@ class MainActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         val intentResult: IntentResult? = IntentIntegrator.parseActivityResult(requestCode, resultCode, data)
+        val intent = Intent(this, WebActivity::class.java)
         extractTitle(intentResult?.contents!!)
                 .subscribeOn(Schedulers.computation())
                 .observeOn(Schedulers.newThread())
                 .map{
                     onNext ->
                         histories.add(History(onNext, intentResult.contents))
+                        SavaPreference.saveShaerdPreference(this, "histories", gson.toJson(histories))
+                        intent.putExtra("url", intentResult.contents)
+                        intent.putExtra("name", onNext)
                 }
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
-
                     adapter.notifyDataSetChanged()
+                    startActivity(intent)
+
                 }
 
 
@@ -77,5 +92,10 @@ class MainActivity : AppCompatActivity() {
             subscriber.onNext(doc.title())
         }
 
+    }
+
+    private fun initHistories(){
+        val type = object : TypeToken<List<History>>(){}.type;
+        histories = gson.fromJson(SavaPreference.getStringPreference(this, "histories"), type) ?: ArrayList<History>()
     }
 }
