@@ -3,6 +3,8 @@ package lee.jaebaom.qrcodereader
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.DividerItemDecoration
+import android.support.v7.widget.LinearLayoutManager
 import android.view.Menu
 import android.view.MenuItem
 import com.google.gson.Gson
@@ -18,6 +20,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
 import lee.jaebaom.qrcodereader.util.SavaPreference
 import org.jsoup.Jsoup
+import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -35,8 +38,11 @@ class MainActivity : AppCompatActivity() {
         SavaPreference.getStringPreference(this, "histories")
 
         initHistories()
-        adapter = MainRecyclerAdapter(histories)
+        adapter = MainRecyclerAdapter(this, histories)
         recycler.adapter = adapter
+
+        val divderDecoration = DividerItemDecoration(applicationContext, LinearLayoutManager(this).orientation)
+        recycler.addItemDecoration(divderDecoration)
 
         fab.setOnClickListener { view ->
             val intent = IntentIntegrator(this)
@@ -70,7 +76,9 @@ class MainActivity : AppCompatActivity() {
                 .observeOn(Schedulers.newThread())
                 .map{
                     onNext ->
-                        histories.add(History(onNext, intentResult.contents))
+                        val dateTimeFormat = SimpleDateFormat("MM-dd HH:mm", Locale.KOREA)
+                        val cal = dateTimeFormat.format(Calendar.getInstance().time)
+                        histories.add(History(onNext, intentResult.contents, cal))
                         SavaPreference.saveShaerdPreference(this, "histories", gson.toJson(histories))
                         intent.putExtra("url", intentResult.contents)
                         intent.putExtra("name", onNext)

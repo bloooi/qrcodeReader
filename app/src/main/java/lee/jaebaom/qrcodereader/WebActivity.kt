@@ -3,8 +3,10 @@ package lee.jaebaom.qrcodereader
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
+import android.content.res.Configuration
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.os.PersistableBundle
 import android.support.v4.content.ContextCompat
 import android.view.MotionEvent
 import android.view.View
@@ -15,7 +17,8 @@ import android.widget.FrameLayout
 import kotlinx.android.synthetic.main.activity_web.*
 
 import android.view.WindowManager
-
+import android.webkit.WebView
+import android.widget.ProgressBar
 
 
 class WebActivity : AppCompatActivity() {
@@ -29,14 +32,17 @@ class WebActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
         initWebView()
 
-        web.loadUrl(url)
+        if (savedInstanceState == null){
+            web.loadUrl(url)
+        }
+
     }
 
     @SuppressLint("SetJavaScriptEnabled")
     private fun initWebView(){
         val setting = web.settings
         web.webViewClient = WebViewClient()
-        web.webChromeClient = WebViewChromeClient(this)
+        web.webChromeClient = WebViewChromeClient(this, progressBar)
         setting.javaScriptEnabled = true
         setting.mediaPlaybackRequiresUserGesture = true
         setting.allowFileAccess = true
@@ -51,7 +57,21 @@ class WebActivity : AppCompatActivity() {
         }
     }
 
-    class WebViewChromeClient(private val activity: Activity): WebChromeClient(){
+    override fun onConfigurationChanged(newConfig: Configuration?) {
+        super.onConfigurationChanged(newConfig)
+    }
+
+    override fun onSaveInstanceState(outState: Bundle?, outPersistentState: PersistableBundle?) {
+        super.onSaveInstanceState(outState, outPersistentState)
+        web.saveState(outState)
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
+        super.onRestoreInstanceState(savedInstanceState)
+        web.restoreState(savedInstanceState)
+    }
+
+    class WebViewChromeClient(private val activity: Activity, private val progressBar: ProgressBar): WebChromeClient(){
         private var customView: View? = null
         private var fullScreenContainer: FrameLayout? = null
         private val COVER_SCREEN_PARAMS = FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
@@ -89,9 +109,17 @@ class WebActivity : AppCompatActivity() {
             activity.requestedOrientation = originalOrientation
         }
 
+        override fun onProgressChanged(view: WebView?, newProgress: Int) {
+            progressBar.progress = newProgress
+            if (newProgress == 100){
+                progressBar.visibility = View.GONE
+            }else{
+                progressBar.visibility = View.VISIBLE
+            }
+        }
         private fun setFullscreen(enabled: Boolean) {
-            val win = activity.getWindow()
-            val winParams = win.getAttributes()
+            val win = activity.window
+            val winParams = win.attributes
             val bits = WindowManager.LayoutParams.FLAG_FULLSCREEN
             if (enabled) {
                 winParams.flags = winParams.flags or bits
@@ -101,7 +129,7 @@ class WebActivity : AppCompatActivity() {
                     customView?.systemUiVisibility = View.SYSTEM_UI_FLAG_VISIBLE
                 }
             }
-            win.setAttributes(winParams)
+            win.attributes = winParams
         }
         class FullScreenHolder(context: Context) : FrameLayout(context){
             init {

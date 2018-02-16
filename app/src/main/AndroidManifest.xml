@@ -25,6 +25,7 @@
         </activity>
         <activity android:name=".WebActivity"
             android:theme="@style/AppTheme.NoActionBar"
+            android:configChanges="keyboardHidden|orientation"
             android:hardwareAccelerated="true"
             >
 
