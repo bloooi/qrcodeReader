@@ -11,3 +11,4 @@
 * Primary color 지정
 * logo 제작
 * 아키텍쳐 적용 (MVP, MVVVM)
+* 리다이렉트 된 링크로 변경
