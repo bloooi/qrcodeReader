@@ -71,24 +71,26 @@ class MainActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         val intentResult: IntentResult? = IntentIntegrator.parseActivityResult(requestCode, resultCode, data)
         val intent = Intent(this, WebActivity::class.java)
-        extractTitle(intentResult?.contents!!)
-                .subscribeOn(Schedulers.computation())
-                .observeOn(Schedulers.newThread())
-                .map{
-                    onNext ->
+        if (data != null){
+            extractTitle(intentResult?.contents!!)
+                    .subscribeOn(Schedulers.computation())
+                    .observeOn(Schedulers.newThread())
+                    .map{
+                        onNext ->
                         val dateTimeFormat = SimpleDateFormat("MM-dd HH:mm", Locale.KOREA)
                         val cal = dateTimeFormat.format(Calendar.getInstance().time)
-                        histories.add(History(onNext, intentResult.contents, cal))
+                        histories.add(0, History(onNext, intentResult.contents, cal))
                         SavaPreference.saveShaerdPreference(this, "histories", gson.toJson(histories))
                         intent.putExtra("url", intentResult.contents)
                         intent.putExtra("name", onNext)
-                }
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe {
-                    adapter.notifyDataSetChanged()
-                    startActivity(intent)
+                    }
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe {
+                        adapter.notifyDataSetChanged()
+                        startActivity(intent)
 
-                }
+                    }
+        }
 
 
         super.onActivityResult(requestCode, resultCode, data)
