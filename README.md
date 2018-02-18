@@ -7,8 +7,8 @@
 ## ToDo
 * ~~히스토리 저장~~
 * 웹뷰 기능 강화
-* QR code 리더 커스텀뷰
-* Primary color 지정
-* logo 제작
-* 아키텍쳐 적용 (MVP, MVVVM)
-* 리다이렉트 된 링크로 변경
+* ~~QR code 리더 커스텀뷰~~
+* ~~Primary color 지정~~
+* ~~logo 제작~~
+* ~~아키텍쳐 적용 (MVP, MVVVM)
+* 리다이렉트 된 링크로 변경~~
