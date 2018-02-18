@@ -15,10 +15,10 @@
         android:layout_marginBottom="4dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="24dp"
-
         android:layout_marginTop="24dp"
+        android:text="name"
+        android:textSize="20sp"
         android:textColor="@android:color/black"
-        android:textSize="16sp"
         app:layout_constraintBottom_toTopOf="@+id/url"
         app:layout_constraintEnd_toStartOf="@+id/time"
         app:layout_constraintHorizontal_bias="0.0"
@@ -27,12 +27,14 @@
 
     <TextView
         android:id="@+id/url"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="24dp"
-        android:textSize="12sp"
+        android:layout_marginEnd="24dp"
+        android:text="url"
+        android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/text"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/text" />
 
@@ -41,6 +43,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="24dp"
+        android:text="time"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/text" />
 </android.support.constraint.ConstraintLayout>

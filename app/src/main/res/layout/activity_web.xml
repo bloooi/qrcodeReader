@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="lee.jaebaom.qrcodereader.WebActivity">
+    tools:context="lee.jaebeom.qrcodereader.WebActivity">
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/appBarLayout"
@@ -13,7 +13,9 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <android.support.v7.widget.Toolbar
+            android:theme="@style/AppTheme.ActionBar"
             android:id="@+id/toolbar"
+            app:titleTextColor="@android:color/white"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
     </android.support.design.widget.AppBarLayout>
@@ -39,7 +41,6 @@
             style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:progress="34"
             />
     </FrameLayout>
 </android.support.constraint.ConstraintLayout>
