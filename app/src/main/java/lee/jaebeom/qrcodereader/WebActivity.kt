@@ -19,13 +19,19 @@ import kotlinx.android.synthetic.main.activity_web.*
 import android.view.WindowManager
 import android.webkit.WebView
 import android.widget.ProgressBar
+import com.crashlytics.android.Crashlytics
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.MobileAds
 
 
 class WebActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val name = intent.extras.getString("name")
+        MobileAds.initialize(this, "ca-app-pub-6141184086884273~6051012421")
+
+        Crashlytics.setString("url", intent.extras.getString("url"));
+        val name = intent.extras.getString("name") ?: "웹사이트"
         val url = intent.extras.getString("url")
         setContentView(R.layout.activity_web)
         toolbar.title = name
@@ -37,6 +43,9 @@ class WebActivity : AppCompatActivity() {
         if (savedInstanceState == null){
             web.loadUrl(url)
         }
+
+        //광고 세팅
+        adInit()
 
     }
 
@@ -59,10 +68,6 @@ class WebActivity : AppCompatActivity() {
         }
     }
 
-    override fun onConfigurationChanged(newConfig: Configuration?) {
-        super.onConfigurationChanged(newConfig)
-    }
-
     override fun onSaveInstanceState(outState: Bundle?, outPersistentState: PersistableBundle?) {
         super.onSaveInstanceState(outState, outPersistentState)
         web.saveState(outState)
@@ -76,6 +81,11 @@ class WebActivity : AppCompatActivity() {
     override fun onSupportNavigateUp(): Boolean {
         finish()
         return true
+    }
+
+    fun adInit(){
+        val adRequest = AdRequest.Builder().build()
+        adView.loadAd(adRequest)
     }
     class WebViewChromeClient(private val activity: Activity, private val progressBar: ProgressBar): WebChromeClient(){
         private var customView: View? = null

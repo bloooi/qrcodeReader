@@ -22,6 +22,7 @@ import lee.jaebeom.qrcodereader.History
 import lee.jaebeom.qrcodereader.R
 import lee.jaebeom.qrcodereader.ScanActivity
 import lee.jaebeom.qrcodereader.WebActivity
+import lee.jaebeom.qrcodereader.util.Checker
 import lee.jaebeom.qrcodereader.util.SavaPreference
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -52,8 +53,7 @@ class MainActivity : AppCompatActivity(), MainContract.View {
             empty_view.visibility = View.VISIBLE
         }
 
-        val divderDecoration = DividerItemDecoration(applicationContext, LinearLayoutManager(this).orientation)
-        recycler.addItemDecoration(divderDecoration)
+        recycler.addItemDecoration(DividerItemDecoration(applicationContext, LinearLayoutManager(this).orientation))
 
         fab.setOnClickListener {
             intentScanner()
@@ -70,7 +70,7 @@ class MainActivity : AppCompatActivity(), MainContract.View {
     }
 
     override fun onDestroy() {
-        presenter?.detacthView()
+        presenter?.detachView()
         super.onDestroy()
     }
     //메뉴를 딱히 안씀
@@ -93,34 +93,44 @@ class MainActivity : AppCompatActivity(), MainContract.View {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         val intentResult: IntentResult? = IntentIntegrator.parseActivityResult(requestCode, resultCode, data)
         val intent = Intent(this, WebActivity::class.java)
+        val cal = SimpleDateFormat("MM-dd HH:mm", Locale.KOREA).format(Calendar.getInstance().time)
+
         if (data != null){
             if (intentResult?.contents != null){
                 progress.visibility = View.VISIBLE
-                presenter?.extractData(intentResult.contents)
-                        ?.subscribeOn(Schedulers.computation())
-                        ?.observeOn(Schedulers.newThread())
-                        ?.map{
-                            onNext ->
-                            val dateTimeFormat = SimpleDateFormat("MM-dd HH:mm", Locale.KOREA)
-                            val cal = dateTimeFormat.format(Calendar.getInstance().time)
-                            histories.add(0, History(onNext.title(), onNext.location(), cal))
-                            SavaPreference.saveShaerdPreference(this, "histories", gson.toJson(histories))
-                            intent.putExtra("url", onNext.location())
-                            intent.putExtra("name", onNext.title())
-                        }
-                        ?.observeOn(AndroidSchedulers.mainThread())
-                        ?.subscribe {
-                            adapter.notifyDataSetChanged()
-                            progress.visibility = View.GONE
-                            empty_view.visibility = View.GONE
-                            startActivity(intent)
+                if (Checker.checkData(intentResult.contents) == "URL"){ //바코드 정보가 URL일 경우
+                    presenter?.extractData(intentResult.contents)
+                            ?.subscribeOn(Schedulers.computation())
+                            ?.observeOn(Schedulers.newThread())
+                            ?.map{
+                                onNext ->
+                                histories.add(0, History(onNext.title(), onNext.location(), cal))
+                                SavaPreference.saveShaerdPreference(this, "histories", gson.toJson(histories))
+                                intent.putExtra("url", onNext.location())
+                                intent.putExtra("name", onNext.title())
+                            }
+                            ?.observeOn(AndroidSchedulers.mainThread())
+                            ?.subscribe {
+                                adapter.notifyDataSetChanged()
+                                progress.visibility = View.GONE
+                                empty_view.visibility = View.GONE
+                                startActivity(intent)
+                            }
+                }else{
+                    histories.add(0, History(intentResult.contents, intentResult.contents, cal))
+                    SavaPreference.saveShaerdPreference(this, "histories", gson.toJson(histories))
+                    empty_view.visibility = View.GONE
+                    progress.visibility = View.GONE
+                    adapter.notifyDataSetChanged()
+                    Snackbar.make(root, "저장됐어요!", Snackbar.LENGTH_SHORT).show()
+                }
 
-                        }
+
+
             }else{
-                Snackbar.make(root, "인식되지 않았습니다. 다시 시도해 주세요.", Snackbar.LENGTH_LONG).show()
+                Snackbar.make(root, "인식되지 않았어요. 다시 시도해 주세요. ㅠㅠ", Snackbar.LENGTH_LONG).show()
             }
         }
-
 
         super.onActivityResult(requestCode, resultCode, data)
     }

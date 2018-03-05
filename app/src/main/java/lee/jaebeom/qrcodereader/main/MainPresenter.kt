@@ -13,7 +13,7 @@ class MainPresenter : MainContract.Presenter {
        this.view = view
     }
 
-    override fun detacthView() {
+    override fun detachView() {
         view = null
     }
     override fun extractData(URL: String) : Observable<Document>? {

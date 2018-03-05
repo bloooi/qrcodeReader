@@ -14,7 +14,7 @@ interface MainContract {
 
     interface Presenter{
         fun attachView(view: View)
-        fun detacthView()
+        fun detachView()
         fun extractData(URL: String) : Observable<Document>?
         fun addHistory()
     }
