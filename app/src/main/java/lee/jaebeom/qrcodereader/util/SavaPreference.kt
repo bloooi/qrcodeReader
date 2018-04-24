@@ -11,7 +11,7 @@ import android.preference.PreferenceManager
 class SavaPreference{
     companion object {
         @SuppressLint("ApplySharedPref")
-        fun saveShaerdPreference(context: Context, key: String, data: String){
+        fun saveSharedPreference(context: Context, key: String, data: String){
             val prefs = PreferenceManager.getDefaultSharedPreferences(context)
             val editor = prefs.edit()
             editor.putString(key, data)
@@ -19,7 +19,7 @@ class SavaPreference{
             editor.apply()
         }
 
-        fun saveShaerdPreference(context: Context, key: String, data: Int){
+        fun saveSharedPreference(context: Context, key: String, data: Int){
             val prefs = PreferenceManager.getDefaultSharedPreferences(context)
             val editor = prefs.edit()
             editor.putInt(key, data)

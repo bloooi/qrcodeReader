@@ -9,7 +9,7 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import kotlinx.android.synthetic.main.item_main.view.*
+import kotlinx.android.synthetic.main.item_url.view.*
 import lee.jaebeom.qrcodereader.History
 import lee.jaebeom.qrcodereader.R
 import lee.jaebeom.qrcodereader.WebActivity
@@ -22,7 +22,7 @@ import java.util.*
 class MainRecyclerAdapter(private val context: Context, private val histories: ArrayList<History>) : RecyclerView.Adapter<MainRecyclerAdapter.MainViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): MainViewHolder =
-            MainViewHolder(LayoutInflater.from(parent?.context).inflate(R.layout.item_main, parent, false))
+            MainViewHolder(LayoutInflater.from(parent?.context).inflate(R.layout.item_url, parent, false))
 
     override fun getItemCount(): Int = histories.size
 

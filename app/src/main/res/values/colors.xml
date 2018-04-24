@@ -6,4 +6,8 @@
     <!--<color name="colorPrimaryDark">#1b1b1b</color>-->
     <color name="colorAccent">#37474f</color>
     <color name="backgroud">#f4f3f5</color>
+
+    <color name="textPrimary">#1a1a1a</color>
+    <color name="textSecondary">#585858</color>
+    <color name="textEtc">#797979</color>
 </resources>

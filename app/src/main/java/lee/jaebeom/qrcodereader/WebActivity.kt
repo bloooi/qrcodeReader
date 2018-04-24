@@ -57,6 +57,8 @@ class WebActivity : AppCompatActivity() {
         setting.javaScriptEnabled = true
         setting.mediaPlaybackRequiresUserGesture = true
         setting.allowFileAccess = true
+        setting.builtInZoomControls = true
+        setting.displayZoomControls = false
 
     }
 

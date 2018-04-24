@@ -43,11 +43,17 @@ class MainActivity : AppCompatActivity(), MainContract.View {
         setSupportActionBar(toolbar)
         attachPresenter()
 
+        //TODO 이거 의미 있는 코드인지 확인
         SavaPreference.getStringPreference(this, "histories")
 
         initHistories()
+
+
         adapter = MainRecyclerAdapter(this, histories)
         recycler.adapter = adapter
+
+//        val itemTouchHelper = ItemTouchHelper(MainCallback())
+//        itemTouchHelper.attachToRecyclerView(recycler)
 
         if(histories.isEmpty()){
             empty_view.visibility = View.VISIBLE
@@ -105,7 +111,7 @@ class MainActivity : AppCompatActivity(), MainContract.View {
                             ?.map{
                                 onNext ->
                                 histories.add(0, History(onNext.title(), onNext.location(), cal))
-                                SavaPreference.saveShaerdPreference(this, "histories", gson.toJson(histories))
+                                SavaPreference.saveSharedPreference(this, "histories", gson.toJson(histories))
                                 intent.putExtra("url", onNext.location())
                                 intent.putExtra("name", onNext.title())
                             }
@@ -118,7 +124,7 @@ class MainActivity : AppCompatActivity(), MainContract.View {
                             }
                 }else{
                     histories.add(0, History(intentResult.contents, intentResult.contents, cal))
-                    SavaPreference.saveShaerdPreference(this, "histories", gson.toJson(histories))
+                    SavaPreference.saveSharedPreference(this, "histories", gson.toJson(histories))
                     empty_view.visibility = View.GONE
                     progress.visibility = View.GONE
                     adapter.notifyDataSetChanged()
@@ -153,7 +159,7 @@ class MainActivity : AppCompatActivity(), MainContract.View {
     }
 
     private fun initHistories(){
-        val type = object : TypeToken<List<History>>(){}.type;
+        val type = object : TypeToken<List<History>>(){}.type
         histories = gson.fromJson(SavaPreference.getStringPreference(this, "histories"), type) ?: ArrayList<History>()
     }
 }
