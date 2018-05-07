@@ -1,55 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_width="match_parent"
     android:background="?attr/selectableItemBackground"
     >
-
-    <TextView
-        android:id="@+id/text"
-        android:layout_width="0dp"
+    <include layout="@layout/item_delete"
+        android:id="@+id/delete"
+        />
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="4dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="24dp"
-        android:text="name"
-        android:fontFamily="@font/noto_sans_kr_medium"
-        android:textSize="18sp"
-        android:textColor="@color/textPrimary"
-        app:layout_constraintBottom_toTopOf="@+id/url"
-        app:layout_constraintEnd_toStartOf="@+id/time"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:background="@android:color/white"
+        >
 
-    <TextView
-        android:id="@+id/url"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="24dp"
-        android:layout_marginEnd="24dp"
-        android:fontFamily="@font/noto_sans_kr_regular"
-        android:text="url"
-        android:textSize="18sp"
-        android:textColor="@color/textSecondary"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/text" />
+        <TextView
+            android:id="@+id/text"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="24dp"
+            android:text="name"
+            android:fontFamily="@font/noto_sans_kr_medium"
+            android:textSize="@dimen/default_text_size"
+            android:textColor="@color/textPrimary"
+            app:layout_constraintBottom_toTopOf="@+id/url"
+            app:layout_constraintEnd_toStartOf="@+id/time"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/time"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="24dp"
-        android:fontFamily="@font/noto_sans_kr_regular"
-        android:textSize="18sp"
-        android:text="time"
-        android:textColor="@color/textEtc"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/text" />
-</android.support.constraint.ConstraintLayout>
+        <TextView
+            android:id="@+id/url"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="24dp"
+            android:layout_marginEnd="24dp"
+            android:fontFamily="@font/noto_sans_kr_regular"
+            android:text="url"
+            android:textSize="@dimen/default_text_size"
+            android:textColor="@color/textSecondary"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@+id/text" />
+
+        <TextView
+            android:id="@+id/time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="24dp"
+            android:fontFamily="@font/noto_sans_kr_regular"
+            android:textSize="18sp"
+            android:text="time"
+            android:textColor="@color/textEtc"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/text" />
+    </android.support.constraint.ConstraintLayout>
+
+</FrameLayout>

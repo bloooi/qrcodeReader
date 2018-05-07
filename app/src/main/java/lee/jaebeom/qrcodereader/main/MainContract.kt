@@ -1,6 +1,8 @@
 package lee.jaebeom.qrcodereader.main
 
+import android.content.SharedPreferences
 import io.reactivex.Observable
+import lee.jaebeom.qrcodereader.History
 import org.jsoup.nodes.Document
 
 /**
@@ -17,5 +19,8 @@ interface MainContract {
         fun detachView()
         fun extractData(URL: String) : Observable<Document>?
         fun addHistory()
+        fun savePreference(pref:SharedPreferences, histories: ArrayList<History>)
+//        fun loadPreference(pref: SharedPreferences) : String
+        fun loadList(pref: SharedPreferences) : ArrayList<History>
     }
 }

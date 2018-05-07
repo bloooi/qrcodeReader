@@ -50,6 +50,6 @@
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
         ads:adSize="SMART_BANNER"
-        ads:adUnitId="ca-app-pub-6141184086884273~6051012421"
+        ads:adUnitId="ca-app-pub-6141184086884273/2649510383"
         />
 </android.support.constraint.ConstraintLayout>

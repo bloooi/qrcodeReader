@@ -1,6 +1,11 @@
 package lee.jaebeom.qrcodereader.main
 
+import android.content.SharedPreferences
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import io.reactivex.Observable
+import lee.jaebeom.qrcodereader.History
+import lee.jaebeom.qrcodereader.util.SavePreference
 import org.jsoup.nodes.Document
 
 /**
@@ -8,6 +13,7 @@ import org.jsoup.nodes.Document
  */
 class MainPresenter : MainContract.Presenter {
     var view: MainContract.View? = null
+    private val gson = Gson()
 
     override fun attachView(view: MainContract.View) {
        this.view = view
@@ -22,5 +28,16 @@ class MainPresenter : MainContract.Presenter {
 
     override fun addHistory() {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun savePreference(pref: SharedPreferences, histories: ArrayList<History>) {
+        SavePreference(pref).saveSharedPreference("histories", gson.toJson(histories))
+    }
+
+    private fun loadPreference(pref: SharedPreferences): String = SavePreference(pref).getStringPreference("histories")
+
+    override fun loadList(pref: SharedPreferences): ArrayList<History> {
+        val type = object : TypeToken<List<History>>(){}.type
+        return gson.fromJson(loadPreference(pref), type) as ArrayList<History>
     }
 }

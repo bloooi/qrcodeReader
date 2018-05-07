@@ -1,13 +1,17 @@
 package lee.jaebeom.qrcodereader.main
 
 import android.content.Intent
+import android.content.SharedPreferences
+import android.graphics.Color
 import android.os.Bundle
+import android.preference.PreferenceManager
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
+import android.support.v7.widget.helper.ItemTouchHelper
 import android.view.View
-import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.google.zxing.integration.android.IntentIntegrator
 import com.google.zxing.integration.android.IntentResult
@@ -23,31 +27,28 @@ import lee.jaebeom.qrcodereader.R
 import lee.jaebeom.qrcodereader.ScanActivity
 import lee.jaebeom.qrcodereader.WebActivity
 import lee.jaebeom.qrcodereader.util.Checker
-import lee.jaebeom.qrcodereader.util.SavaPreference
+import lee.jaebeom.qrcodereader.util.SavePreference
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 
-class MainActivity : AppCompatActivity(), MainContract.View {
-
+class MainActivity : AppCompatActivity(), MainContract.View, MainCallback.OnItemHelperListener {
     private var presenter: MainContract.Presenter? = null
     private var histories = ArrayList<History>()
     private lateinit var adapter : MainRecyclerAdapter
-    private val gson = Gson()
+    private val preference : SharedPreferences by lazy {
+        PreferenceManager.getDefaultSharedPreferences(this)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
         attachPresenter()
-
-        //TODO 이거 의미 있는 코드인지 확인
-        SavaPreference.getStringPreference(this, "histories")
-
         initHistories()
-
 
         adapter = MainRecyclerAdapter(this, histories)
         recycler.adapter = adapter
@@ -60,6 +61,15 @@ class MainActivity : AppCompatActivity(), MainContract.View {
         }
 
         recycler.addItemDecoration(DividerItemDecoration(applicationContext, LinearLayoutManager(this).orientation))
+
+        ItemTouchHelper(MainCallback(0, ItemTouchHelper.LEFT, this)).attachToRecyclerView(recycler)
+//        val simpleHelper: ItemTouchHelper.SimpleCallback = object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.UP){
+//            override fun onMove(recyclerView: RecyclerView?, viewHolder: RecyclerView.ViewHolder?, target: RecyclerView.ViewHolder?): Boolean = false
+//
+//            override fun onSwiped(viewHolder: RecyclerView.ViewHolder?, direction: Int) {}
+//        }
+//        ItemTouchHelper(simpleHelper).attachToRecyclerView(recycler)
+//
 
         fab.setOnClickListener {
             intentScanner()
@@ -79,22 +89,6 @@ class MainActivity : AppCompatActivity(), MainContract.View {
         presenter?.detachView()
         super.onDestroy()
     }
-    //메뉴를 딱히 안씀
-//    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-//        // Inflate the menu; this adds items to the action bar if it is present.
-//        menuInflater.inflate(R.menu.menu_main, menu)
-//        return true
-//    }
-//
-//    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-//        // Handle action bar item clicks here. The action bar will
-//        // automatically handle clicks on the Home/Up button, so long
-//        // as you specify a parent activity in AndroidManifest.xml.
-//        return when (item.itemId) {
-//            R.id.action_settings -> true
-//            else -> super.onOptionsItemSelected(item)
-//        }
-//    }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         val intentResult: IntentResult? = IntentIntegrator.parseActivityResult(requestCode, resultCode, data)
@@ -111,7 +105,8 @@ class MainActivity : AppCompatActivity(), MainContract.View {
                             ?.map{
                                 onNext ->
                                 histories.add(0, History(onNext.title(), onNext.location(), cal))
-                                SavaPreference.saveSharedPreference(this, "histories", gson.toJson(histories))
+                                presenter?.savePreference(preference, histories)
+//                                SavePreference.saveSharedPreference(this, "histories", gson.toJson(histories))
                                 intent.putExtra("url", onNext.location())
                                 intent.putExtra("name", onNext.title())
                             }
@@ -124,7 +119,8 @@ class MainActivity : AppCompatActivity(), MainContract.View {
                             }
                 }else{
                     histories.add(0, History(intentResult.contents, intentResult.contents, cal))
-                    SavaPreference.saveSharedPreference(this, "histories", gson.toJson(histories))
+                    presenter?.savePreference(preference, histories)
+//                    SavePreference.saveSharedPreference(this, "histories", gson.toJson(histories))
                     empty_view.visibility = View.GONE
                     progress.visibility = View.GONE
                     adapter.notifyDataSetChanged()
@@ -159,7 +155,25 @@ class MainActivity : AppCompatActivity(), MainContract.View {
     }
 
     private fun initHistories(){
-        val type = object : TypeToken<List<History>>(){}.type
-        histories = gson.fromJson(SavaPreference.getStringPreference(this, "histories"), type) ?: ArrayList<History>()
+        histories = presenter?.loadList(preference) ?: ArrayList()
+//        histories = gson.fromJson(SavePreference.getStringPreference(this, "histories"), type) ?: ArrayList<History>()
     }
+
+    override fun onSwiped(viewHolder: RecyclerView.ViewHolder?, direction: Int, position: Int) {
+        if (viewHolder is MainRecyclerAdapter.MainViewHolder){
+            val index = viewHolder.adapterPosition
+            val item = histories[index]
+
+            adapter.removeItem(index)
+            presenter?.savePreference(preference, histories)
+            Snackbar.make(viewHolder.itemView, "목록을 삭제되었어요", Snackbar.LENGTH_LONG)
+                    .setAction("되돌리기", View.OnClickListener {
+                        adapter.restoreItem(item, index)
+                        presenter?.savePreference(preference, histories)
+                    })
+                    .setActionTextColor(Color.YELLOW)
+                    .show()
+        }
+    }
+
 }

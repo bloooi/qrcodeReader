@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.os.PersistableBundle
 import android.support.v4.content.ContextCompat
+import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
@@ -20,6 +21,7 @@ import android.view.WindowManager
 import android.webkit.WebView
 import android.widget.ProgressBar
 import com.crashlytics.android.Crashlytics
+import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.MobileAds
 
@@ -28,6 +30,7 @@ class WebActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         MobileAds.initialize(this, "ca-app-pub-6141184086884273~6051012421")
 
         Crashlytics.setString("url", intent.extras.getString("url"));
@@ -88,6 +91,12 @@ class WebActivity : AppCompatActivity() {
     fun adInit(){
         val adRequest = AdRequest.Builder().build()
         adView.loadAd(adRequest)
+        adView.adListener = object: AdListener(){
+            override fun onAdFailedToLoad(p0: Int) {
+                //TODO: 광고 로드 실패시 에러 리포트 하기
+                Log.e("AdMob", "Ad load fail : $p0")
+            }
+        }
     }
     class WebViewChromeClient(private val activity: Activity, private val progressBar: ProgressBar): WebChromeClient(){
         private var customView: View? = null

@@ -10,4 +10,6 @@
     <color name="textPrimary">#1a1a1a</color>
     <color name="textSecondary">#585858</color>
     <color name="textEtc">#797979</color>
+
+    <color name="item_delete_background">#f44336</color>
 </resources>

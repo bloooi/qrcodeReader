@@ -49,6 +49,16 @@ class MainRecyclerAdapter(private val context: Context, private val histories: A
 
     }
 
+    fun removeItem(position: Int){
+        histories.removeAt(position)
+        notifyItemRemoved(position)
+    }
+
+    fun restoreItem(item: History, position: Int){
+        histories.add(position, item)
+        notifyItemInserted(position)
+    }
+
     class MainViewHolder(itemView: View?) : RecyclerView.ViewHolder(itemView){
         lateinit var history: History
         fun bind(history: History){
