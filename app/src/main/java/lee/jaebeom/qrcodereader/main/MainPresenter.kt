@@ -36,8 +36,8 @@ class MainPresenter : MainContract.Presenter {
 
     private fun loadPreference(pref: SharedPreferences): String = SavePreference(pref).getStringPreference("histories")
 
-    override fun loadList(pref: SharedPreferences): ArrayList<History> {
+    override fun loadList(pref: SharedPreferences): ArrayList<History>? {
         val type = object : TypeToken<List<History>>(){}.type
-        return gson.fromJson(loadPreference(pref), type) as ArrayList<History>
+        return gson.fromJson(loadPreference(pref), type)
     }
 }

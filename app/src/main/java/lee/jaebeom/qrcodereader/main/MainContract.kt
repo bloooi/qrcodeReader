@@ -21,6 +21,6 @@ interface MainContract {
         fun addHistory()
         fun savePreference(pref:SharedPreferences, histories: ArrayList<History>)
 //        fun loadPreference(pref: SharedPreferences) : String
-        fun loadList(pref: SharedPreferences) : ArrayList<History>
+        fun loadList(pref: SharedPreferences) : ArrayList<History>?
     }
 }
