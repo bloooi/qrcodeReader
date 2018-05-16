@@ -27,14 +27,13 @@ class MainPresenter : MainContract.Presenter {
     }
 
     override fun addHistory() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun savePreference(pref: SharedPreferences, histories: ArrayList<History>) {
-        SavePreference(pref).saveSharedPreference("histories", gson.toJson(histories))
-    }
+    override fun savePreference(pref: SharedPreferences, histories: ArrayList<History>)
+            = SavePreference(pref).saveSharedPreference("histories", gson.toJson(histories))
 
-    private fun loadPreference(pref: SharedPreferences): String = SavePreference(pref).getStringPreference("histories")
+    private fun loadPreference(pref: SharedPreferences): String
+            = SavePreference(pref).getStringPreference("histories")
 
     override fun loadList(pref: SharedPreferences): ArrayList<History>? {
         val type = object : TypeToken<List<History>>(){}.type

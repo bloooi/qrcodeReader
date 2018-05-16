@@ -15,20 +15,21 @@ import lee.jaebeom.qrcodereader.R
 import lee.jaebeom.qrcodereader.WebActivity
 import lee.jaebeom.qrcodereader.util.Checker
 import java.util.*
+import kotlin.collections.ArrayList
 
 /**
  * Created by leejaebeom on 2018. 2. 16..
  */
 class MainRecyclerAdapter(private val context: Context, private val histories: ArrayList<History>) : RecyclerView.Adapter<MainRecyclerAdapter.MainViewHolder>() {
 
-    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): MainViewHolder =
-            MainViewHolder(LayoutInflater.from(parent?.context).inflate(R.layout.item_url, parent, false))
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MainViewHolder =
+            MainViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_url, parent, false))
 
     override fun getItemCount(): Int = histories.size
 
-    override fun onBindViewHolder(holder: MainViewHolder?, position: Int) {
-        holder?.bind(histories[position])
-        holder?.itemView?.setOnClickListener {
+    override fun onBindViewHolder(holder: MainViewHolder, position: Int) {
+        holder.bind(histories[position])
+        holder.itemView?.setOnClickListener {
             if(Checker.checkData(histories[position].content) == "URL"){
                 val intent = Intent(context, WebActivity::class.java)
                 intent.putExtra("url", histories[position].content)
@@ -39,7 +40,7 @@ class MainRecyclerAdapter(private val context: Context, private val histories: A
             }
         }
 
-        holder?.itemView?.setOnLongClickListener {
+        holder.itemView?.setOnLongClickListener {
             val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
             val clip = ClipData.newPlainText("url", histories[position].content)
             clipboard.primaryClip = clip
