@@ -2,10 +2,8 @@ package lee.jaebeom.qrcodereader.main
 
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
-import android.content.SharedPreferences
 import android.graphics.Color
 import android.os.Bundle
-import android.preference.PreferenceManager
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.DividerItemDecoration
@@ -15,7 +13,6 @@ import android.support.v7.widget.helper.ItemTouchHelper
 import android.view.View
 import com.google.zxing.integration.android.IntentIntegrator
 import com.google.zxing.integration.android.IntentResult
-import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 
@@ -27,20 +24,14 @@ import lee.jaebeom.qrcodereader.R
 import lee.jaebeom.qrcodereader.ScanActivity
 import lee.jaebeom.qrcodereader.WebActivity
 import lee.jaebeom.qrcodereader.util.Checker
-import org.jsoup.Jsoup
-import org.jsoup.nodes.Document
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 import android.arch.lifecycle.Observer
 
-class MainActivity : AppCompatActivity(), MainContract.View, MainCallback.OnItemHelperListener {
-    private var presenter: MainContract.Presenter? = null
+class MainActivity : AppCompatActivity(), MainCallback.OnItemHelperListener {
     private var mainHistories = ArrayList<History>()
     private lateinit var adapter : MainRecyclerAdapter
-//    private val preference : SharedPreferences by lazy {
-//        PreferenceManager.getDefaultSharedPreferences(this)
-//    }
 
     private val viewModel : MainViewModel by lazy {
         ViewModelProviders.of(this).get(MainViewModel::class.java)
@@ -60,16 +51,6 @@ class MainActivity : AppCompatActivity(), MainContract.View, MainCallback.OnItem
 //        val itemTouchHelper = ItemTouchHelper(MainCallback())
 //        itemTouchHelper.attachToRecyclerView(recycler)
 
-        viewModel.histories.observe(this, Observer {
-            adapter.notifyDataSetChanged()
-            progress.visibility = View.GONE
-            if(mainHistories.isEmpty()){
-                empty_view.visibility = View.VISIBLE
-            }else{
-                empty_view.visibility = View.GONE
-            }
-        })
-
         recycler.addItemDecoration(DividerItemDecoration(applicationContext, LinearLayoutManager(this).orientation))
 
         ItemTouchHelper(MainCallback(0, ItemTouchHelper.LEFT, this)).attachToRecyclerView(recycler)
@@ -84,20 +65,6 @@ class MainActivity : AppCompatActivity(), MainContract.View, MainCallback.OnItem
         fab.setOnClickListener {
             intentScanner()
         }
-    }
-
-    private fun attachPresenter(){
-        presenter = lastCustomNonConfigurationInstance as MainContract.Presenter? ?: MainPresenter()
-        presenter?.attachView(this)
-    }
-
-    override fun onRetainCustomNonConfigurationInstance(): Any {
-        return presenter!!
-    }
-
-    override fun onDestroy() {
-        presenter?.detachView()
-        super.onDestroy()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -149,16 +116,7 @@ class MainActivity : AppCompatActivity(), MainContract.View, MainCallback.OnItem
         super.onActivityResult(requestCode, resultCode, data)
     }
 
-    //view override function
-    override fun extractTitle(URL: String) : Observable<Document>{
-        return Observable.create<Document> {subscriber ->
-            val doc = Jsoup.connect(URL).get()
-            subscriber.onNext(doc)
-        }
-
-    }
-
-    override fun intentScanner() {
+    private fun intentScanner() {
         IntentIntegrator(this)
                 .setOrientationLocked(false)
                 .setCaptureActivity(ScanActivity::class.java)
@@ -167,7 +125,17 @@ class MainActivity : AppCompatActivity(), MainContract.View, MainCallback.OnItem
     }
 
     private fun initHistories(){
-        mainHistories = ArrayList(viewModel.histories.value ?: ArrayList() )
+        mainHistories = ArrayList(viewModel.histories.value ?: ArrayList())
+
+        viewModel.histories.observe(this, Observer {
+            adapter.notifyDataSetChanged()
+            progress.visibility = View.GONE
+            if(mainHistories.isEmpty()){
+                empty_view.visibility = View.VISIBLE
+            }else{
+                empty_view.visibility = View.GONE
+            }
+        })
 
     }
 
