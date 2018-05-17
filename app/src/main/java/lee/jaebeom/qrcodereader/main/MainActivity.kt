@@ -30,7 +30,6 @@ import kotlin.collections.ArrayList
 import android.arch.lifecycle.Observer
 
 class MainActivity : AppCompatActivity(), MainCallback.OnItemHelperListener {
-    private var mainHistories = ArrayList<History>()
     private lateinit var adapter : MainRecyclerAdapter
 
     private val viewModel : MainViewModel by lazy {
@@ -42,26 +41,13 @@ class MainActivity : AppCompatActivity(), MainCallback.OnItemHelperListener {
 
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
-//        attachPresenter()
         initHistories()
-
-        adapter = MainRecyclerAdapter(this, mainHistories)
+        adapter = MainRecyclerAdapter(this, ArrayList(viewModel.histories.value))
         recycler.adapter = adapter
-
-//        val itemTouchHelper = ItemTouchHelper(MainCallback())
-//        itemTouchHelper.attachToRecyclerView(recycler)
 
         recycler.addItemDecoration(DividerItemDecoration(applicationContext, LinearLayoutManager(this).orientation))
 
         ItemTouchHelper(MainCallback(0, ItemTouchHelper.LEFT, this)).attachToRecyclerView(recycler)
-//        val simpleHelper: ItemTouchHelper.SimpleCallback = object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.UP){
-//            override fun onMove(recyclerView: RecyclerView?, viewHolder: RecyclerView.ViewHolder?, target: RecyclerView.ViewHolder?): Boolean = false
-//
-//            override fun onSwiped(viewHolder: RecyclerView.ViewHolder?, direction: Int) {}
-//        }
-//        ItemTouchHelper(simpleHelper).attachToRecyclerView(recycler)
-//
-
         fab.setOnClickListener {
             intentScanner()
         }
@@ -70,7 +56,7 @@ class MainActivity : AppCompatActivity(), MainCallback.OnItemHelperListener {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         val intentResult: IntentResult? = IntentIntegrator.parseActivityResult(requestCode, resultCode, data)
         val cal = SimpleDateFormat("MM-dd HH:mm", Locale.KOREA).format(Calendar.getInstance().time)
-
+        val temp : ArrayList<History> = ArrayList(viewModel.histories.value)
         if (data != null){
             if (intentResult?.contents != null){
                 progress.visibility = View.VISIBLE
@@ -81,28 +67,21 @@ class MainActivity : AppCompatActivity(), MainCallback.OnItemHelperListener {
                             ?.observeOn(Schedulers.newThread())
                             ?.map{
                                 onNext ->
-                                mainHistories.add(0, History(onNext.title(), onNext.location(), cal))
-                                viewModel.histories.postValue(mainHistories)
-                                viewModel.savePreference(mainHistories)
-//                                SavePreference.saveSharedPreference(this, "mainHistories", gson.toJson(mainHistories))
+
+                                temp.add(0, History(onNext.title(), onNext.location(), cal))
+                                viewModel.histories.postValue(temp.toList())
+                                viewModel.savePreference(temp)
                                 intent.putExtra("url", onNext.location())
                                 intent.putExtra("name", onNext.title())
                             }
                             ?.observeOn(AndroidSchedulers.mainThread())
                             ?.subscribe {
-//                                adapter.notifyDataSetChanged()
-//                                progress.visibility = View.GONE
-//                                empty_view.visibility = View.GONE
                                 startActivity(intent)
                             }
                 }else{
-                    mainHistories.add(0, History(intentResult.contents, intentResult.contents, cal))
-                    viewModel.histories.value = mainHistories
-                    viewModel.savePreference(mainHistories)
-//                    SavePreference.saveSharedPreference(this, "mainHistories", gson.toJson(mainHistories))
-//                    empty_view.visibility = View.GONE
-//                    progress.visibility = View.GONE
-//                    adapter.notifyDataSetChanged()
+                    temp.add(0, History(intentResult.contents, intentResult.contents, cal))
+                    viewModel.histories.value = temp
+                    viewModel.savePreference(temp)
                     Snackbar.make(root, "저장됐어요!", Snackbar.LENGTH_SHORT).show()
                 }
 
@@ -125,12 +104,14 @@ class MainActivity : AppCompatActivity(), MainCallback.OnItemHelperListener {
     }
 
     private fun initHistories(){
-        mainHistories = ArrayList(viewModel.histories.value ?: ArrayList())
+//        mainHistories = ArrayList(viewModel.histories.value ?: ArrayList())
 
         viewModel.histories.observe(this, Observer {
-            adapter.notifyDataSetChanged()
+//            adapter.notifyDataSetChanged()
+            adapter.updateList(it!!)
+
             progress.visibility = View.GONE
-            if(mainHistories.isEmpty()){
+            if(it.isEmpty()){
                 empty_view.visibility = View.VISIBLE
             }else{
                 empty_view.visibility = View.GONE
@@ -142,16 +123,17 @@ class MainActivity : AppCompatActivity(), MainCallback.OnItemHelperListener {
     override fun onSwiped(viewHolder: RecyclerView.ViewHolder?, direction: Int, position: Int) {
         if (viewHolder is MainRecyclerAdapter.MainViewHolder){
             val index = viewHolder.adapterPosition
-            val item = mainHistories[index]
+            val temp : ArrayList<History> = ArrayList(viewModel.histories.value)
+            val item = temp[index]
 
-            adapter.removeItem(index)
-            viewModel.histories.value = mainHistories
-            viewModel.savePreference(mainHistories)
+            temp.removeAt(position)
+            viewModel.histories.value = temp
+            viewModel.savePreference(temp)
             Snackbar.make(viewHolder.itemView, "목록을 삭제되었어요", Snackbar.LENGTH_LONG)
-                    .setAction("되돌리기", View.OnClickListener {
-                        adapter.restoreItem(item, index)
-                        viewModel.histories.value = mainHistories
-                        viewModel.savePreference(mainHistories)
+                    .setAction("되돌리기", {
+                        temp.add(position, item)
+                        viewModel.histories.value = temp
+                        viewModel.savePreference(temp)
                     })
                     .setActionTextColor(Color.YELLOW)
                     .show()

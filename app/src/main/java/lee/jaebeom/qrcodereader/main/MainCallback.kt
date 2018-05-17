@@ -21,7 +21,7 @@ import lee.jaebeom.qrcodereader.History
  * Created by leejaebeom on 2018. 3. 23..
  */
 
-class MainCallback(dragDirs: Int, swipeDirs: Int, val listener: OnItemHelperListener) : ItemTouchHelper.SimpleCallback(dragDirs, swipeDirs) {
+class MainCallback(dragDirs: Int, swipeDirs: Int, private val listener: OnItemHelperListener) : ItemTouchHelper.SimpleCallback(dragDirs, swipeDirs) {
     override fun onMove(recyclerView: RecyclerView?, viewHolder: RecyclerView.ViewHolder?, target: RecyclerView.ViewHolder?): Boolean = true
 
     override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {

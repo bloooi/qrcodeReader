@@ -5,15 +5,22 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.support.design.widget.Snackbar
+import android.support.v7.util.DiffUtil
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import io.reactivex.Flowable
+import io.reactivex.Observable
+import io.reactivex.Scheduler
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.item_url.view.*
 import lee.jaebeom.qrcodereader.History
 import lee.jaebeom.qrcodereader.R
 import lee.jaebeom.qrcodereader.WebActivity
 import lee.jaebeom.qrcodereader.util.Checker
+import lee.jaebeom.qrcodereader.util.RecyclerDiffUtil
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -50,14 +57,19 @@ class MainRecyclerAdapter(private val context: Context, private val histories: A
 
     }
 
-    fun removeItem(position: Int){
-        histories.removeAt(position)
-        notifyItemRemoved(position)
-    }
+    fun updateList(newList: List<History>){
+        val callback = RecyclerDiffUtil(this.histories, newList)
+        val diffResult = DiffUtil.calculateDiff(callback)
+        this.histories.clear()
+        this.histories.addAll(newList)
 
-    fun restoreItem(item: History, position: Int){
-        histories.add(position, item)
-        notifyItemInserted(position)
+        diffResult.dispatchUpdatesTo(this)
+//        Flowable.just(diffResult)
+//                .observeOn(Schedulers.single())
+//                .subscribeOn(AndroidSchedulers.mainThread())
+//                .subscribe {
+//                    diffResult.dispatchUpdatesTo(this@MainRecyclerAdapter)
+//                }
     }
 
     class MainViewHolder(itemView: View?) : RecyclerView.ViewHolder(itemView){
